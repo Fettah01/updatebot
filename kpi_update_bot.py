@@ -73,7 +73,7 @@ PROJECTS = [
      "target": {"total": 14, "video": 5, "motion": 5, "post": 4}},
     {"name": "Fortex",             "manager": "Omilxon",   "ig": "fortex.gisht",
      "target": {"total": 12, "video": 6, "motion": 2, "post": 4}},
-    {"name": "Basaltium",          "manager": "Omilxon",   "ig": "basaltiumuz",
+    {"name": "Basaltium",          "manager": "Omilxon",   "ig": "basaltium_uz",
      "target": {"total": 14, "video": 8, "motion": 2, "post": 4}},
     {"name": "Aventos",            "manager": "Saydulloh", "ig": "aventosgroup.uz",
      "target": {"total": 10, "video": 7, "motion": 2, "post": 1}},
