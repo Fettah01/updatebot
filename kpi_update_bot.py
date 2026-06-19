@@ -15,6 +15,7 @@ Talab qilinadigan kutubxonalar:
 """
 
 import os
+import json
 import logging
 from datetime import time as dtime
 
@@ -53,7 +54,14 @@ log = logging.getLogger("kpi_bot")
 # ----------------------- GOOGLE SHEETS ----------------------------
 def _gc():
     scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
-    creds = Credentials.from_service_account_file(GOOGLE_CREDS, scopes=scopes)
+    # Railway/serverda: JSON ni to'g'ridan env var ichida saqlaymiz.
+    # Lokalda: service_account.json faylidan o'qiydi.
+    raw = os.getenv("GOOGLE_CREDS_JSON", "").strip()
+    if raw:
+        info = json.loads(raw)
+        creds = Credentials.from_service_account_info(info, scopes=scopes)
+    else:
+        creds = Credentials.from_service_account_file(GOOGLE_CREDS, scopes=scopes)
     return gspread.authorize(creds)
 
 
