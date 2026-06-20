@@ -324,6 +324,9 @@ def build_message(summary, meeting=None):
     days_left = max(_days_in_month(now) - now.day, 0)
     month = MONTHS_UZ[now.month]
  
+    def recency(last):
+        return "bugun post bor" if last == 0 else f"oxirgi post {last} kun oldin"
+ 
     good, bad = [], []
     for p in PROJECTS:
         d = summary.get(p["name"])
@@ -331,36 +334,39 @@ def build_message(summary, meeting=None):
             continue
         tgt = p["target"]
         v_tgt = tgt["video"] + tgt["motion"]   # IG'da motion ham video
-        breakdown = f"🎬{d['videos']}/{v_tgt} 🖼{d['images']}/{tgt['post']}"
-        eng = f"❤️{d['avg_likes']} 💬{d['avg_comments']}" if d["posts"] else ""
         last = d["last_days"]
         remaining = max(tgt["total"] - d["posts"], 0)
+        detail = (f"Reja {d['posts']}/{tgt['total']} · Video {d['videos']}/{v_tgt} · "
+                  f"Post {d['images']}/{tgt['post']}")
  
         if last is None:
-            bad.append((p, f"shu oyda post yo'q ❗ | reja {tgt['total']}"))
+            bad.append([f"🔴 <b>{p['name']}</b> — {p['manager']}",
+                        f"   Shu oyda post yo'q · reja {tgt['total']}"])
         elif last <= LATE_AFTER_DAYS:
-            good.append((p, f"oxirgi post {last} kun oldin | {d['posts']}/{tgt['total']} "
-                            f"({breakdown}) {eng} ✅"))
+            good.append([f"🟢 <b>{p['name']}</b> — {p['manager']}",
+                         f"   {detail} · {recency(last)}"])
         else:
-            extra = f" — yana {remaining} ta, {days_left} kun qoldi" if remaining else ""
-            bad.append((p, f"oxirgi post {last} kun oldin ⚠️ | {d['posts']}/{tgt['total']} "
-                           f"({breakdown}){extra}"))
+            extra = f" — yana {remaining} ta ({days_left} kun qoldi)" if remaining else ""
+            bad.append([f"🔴 <b>{p['name']}</b> — {p['manager']}",
+                        f"   {detail} · {recency(last)}{extra}"])
  
     lines = [f"📊 <b>SMM UPDATE — {now.day}-{month}</b>"]
     lines.append(f"Yaxshi: <b>{len(good)}</b>  |  Orqada: <b>{len(bad)}</b>  |  Oygacha {days_left} kun")
     lines.append("")
  
     if good:
-        lines.append("🟢 <b>Yaxshi ketayotgan loyihalar:</b>")
-        for p, st in good:
-            lines.append(f"  • {p['name']} — {p['manager']} — {st}")
+        lines.append("<b>🟢 Yaxshi ketayotgan loyihalar</b>")
         lines.append("")
+        for block in good:
+            lines.extend(block)
+            lines.append("")
  
     if bad:
-        lines.append("🔴 <b>Orqada qolgan loyihalar:</b>")
-        for p, st in bad:
-            lines.append(f"  • {p['name']} — {p['manager']} — {st}")
+        lines.append("<b>🔴 Orqada qolgan loyihalar</b>")
         lines.append("")
+        for block in bad:
+            lines.extend(block)
+            lines.append("")
  
     # Manager reytingi
     ranked = manager_ranking(summary)
